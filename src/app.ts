@@ -101,13 +101,14 @@ class PopUp extends Control{
 
   constructor(parentNode: HTMLElement, data:IData){
     super(parentNode);
-    const dataContainer = new Control(this.node);
+    const overlay = new Control(this.node, 'div', 'popup_overlay');
+    const dataContainer = new Control(overlay.node, 'div', 'popup_wrapper');
     this.id = new Control(dataContainer.node, 'div', '', data.id.toString());
     this.userId = new Control(dataContainer.node, 'div', '', data.userId.toString());
     this.title = new Control(dataContainer.node, 'div', '', data.title);
     this.body = new Control(dataContainer.node, 'div', '', data.body);
 
-    const buttons = new Control(this.node);
+    const buttons = new Control(dataContainer.node);
     const closeButton = new Control(buttons.node, 'button', '', 'close');
     closeButton.node.onclick = ()=>{
       this.onClose();

@@ -39,18 +39,35 @@ class DataItem implements IData{
 }
 
 export class DataModel{
-  public data: Array<IData>
+  private data: Array<IData>
+
+  private currentPage: number = 0;
+
+  public currentData: Array<IData> = [];
+  onUpdate: (page:number, data:Array<IData>)=>void;
 
   constructor(){
 
   }
 
+  setPage(pageIndex:number){
+    console.log(pageIndex);
+    this.currentPage = pageIndex;
+    this.currentData = this.data.slice(this.currentPage, this.currentPage+5);
+    this.onUpdate(this.currentPage, this.currentData);
+  }
+
+  getCurrentPage(){
+    return this.currentPage;
+  }
+  
   public load(){
     return fetch('http://jsonplaceholder.typicode.com/posts').then(res=>res.json()).then(res=>{
       if (!Array.isArray(res)){
         throw new Error('Data loading error, result is not array');
       }
       this.data = res.map(it=> new DataItem(it));
+      this.setPage(0);
       return this;
     });
   }
@@ -120,9 +137,15 @@ export class Application extends Control{
   constructor(parentNode: HTMLElement){
     super(parentNode);
     const model = new DataModel();
-    model.load().then(loaded=>{
-      loaded.data.map(itemData=>{
-        const itemView = new DataItemView(this.node);
+    const dataView = new Control(this.node);
+
+    const viewList: Array<DataItemView> = [];
+
+    /*model.load().then(loaded=>{
+      loaded.currentData.map(itemData=>{
+        const itemView = new DataItemView(dataView.node);
+
+        viewList.push(itemView);
         itemView.onOpen = ()=>{
           //console.log(itemData);
           const popup = new PopUp(this.node, itemData);
@@ -132,6 +155,40 @@ export class Application extends Control{
         }
         itemView.update(itemData);
       });
-    })
+    })*/
+
+    model.onUpdate = (page, data)=>{
+      viewList.forEach(it=>it.destroy());
+      data.map(itemData=>{
+        const itemView = new DataItemView(dataView.node);
+        viewList.push(itemView);
+        itemView.onOpen = ()=>{
+          //console.log(itemData);
+          const popup = new PopUp(this.node, itemData);
+          popup.onClose = ()=>{
+            popup.destroy();
+          }
+        }
+        itemView.update(itemData);
+      });
+      /*viewList.forEach((view, i)=>{
+        if (data[i]){
+          view.update(data[i]);
+        }
+      })*/
+    }
+
+    const buttons = new Control(this.node);
+    const leftButton = new Control(buttons.node, 'button', '', 'left');
+    leftButton.node.onclick = ()=>{
+      model.setPage(model.getCurrentPage() - 1);
+    }
+
+    const rightButton = new Control(buttons.node, 'button', '', 'right');
+    rightButton.node.onclick = ()=>{
+      model.setPage(model.getCurrentPage() + 1);
+    }
+
+    model.load();
   }
 }

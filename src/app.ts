@@ -171,11 +171,6 @@ export class Application extends Control{
         }
         itemView.update(itemData);
       });
-      /*viewList.forEach((view, i)=>{
-        if (data[i]){
-          view.update(data[i]);
-        }
-      })*/
     }
 
     const buttons = new Control(this.node);

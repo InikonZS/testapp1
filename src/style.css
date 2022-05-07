@@ -18,4 +18,25 @@
   max-width: 500px;
   min-height: 300px;
   background-color: #fff;
+  transition-duration: 500ms;
+  transform: scale(0);
+}
+
+.popup_wrapper__open{
+  transform: scale(1);
+}
+
+body{
+  margin: 0;
+}
+
+.grid{
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  height: 100vh;
+}
+
+.grid_item{
+  border: solid 3px;
+  background-color: #cfc;
 }

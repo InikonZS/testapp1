@@ -120,6 +120,7 @@ class PopUp extends Control{
     super(parentNode);
     const overlay = new Control(this.node, 'div', 'popup_overlay');
     const dataContainer = new Control(overlay.node, 'div', 'popup_wrapper');
+
     this.id = new Control(dataContainer.node, 'div', '', data.id.toString());
     this.userId = new Control(dataContainer.node, 'div', '', data.userId.toString());
     this.title = new Control(dataContainer.node, 'div', '', data.title);
@@ -128,8 +129,15 @@ class PopUp extends Control{
     const buttons = new Control(dataContainer.node);
     const closeButton = new Control(buttons.node, 'button', '', 'close');
     closeButton.node.onclick = ()=>{
-      this.onClose();
+      dataContainer.node.classList.remove('popup_wrapper__open');
+      dataContainer.node.ontransitionend = ()=>{
+        this.onClose();
+      }
     }
+
+    requestAnimationFrame(()=>{requestAnimationFrame(()=>{
+      dataContainer.node.classList.add('popup_wrapper__open');
+    })})
   }
 }
 

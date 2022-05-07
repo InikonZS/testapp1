@@ -9,7 +9,8 @@
     "build:dev": "webpack --mode=development",
     "build:prod": "webpack --mode=production --node-env=production",
     "watch": "webpack --watch",
-    "start": "webpack serve"
+    "start": "webpack serve",
+    "demo1": "npx sass demo1/stl.scss demo1/dist/stl.css --watch"
   },
   "repository": {
     "type": "git",
@@ -21,7 +22,9 @@
     "url": "https://github.com/InikonZS/testapp1/issues"
   },
   "homepage": "https://github.com/InikonZS/testapp1#readme",
-  "dependencies": {},
+  "dependencies": {
+    "sass": "^1.51.0"
+  },
   "devDependencies": {
     "@webpack-cli/generators": "^2.4.2",
     "css-loader": "^6.7.1",

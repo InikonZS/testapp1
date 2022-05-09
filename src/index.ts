@@ -1,240 +1,395 @@
 import "./style.css";
-import { Application } from "./demo2";
+import Control from "./control";
+import Signal from "./signal";
 
-const app = new Application(document.body);
+class App extends Control{
+  private lastFrameId: number;
+  private lTime: number = 0;
 
-function aa (arg:number, callback:(a:{b:number, c:Application})=>{g:number}):boolean{
-  return true;
-}
+  private counter:number = 0;
+  private objects: Array<GameObject> = [];
+  private scoreView: Control<HTMLElement>;
 
-let r = aa(1, (v)=>{
-  return {g: 1}});
-
-interface ISomething{
-  m: ()=>void
-}
-
-interface IB{
-  b: ()=>void
-}
-
-class A1<T> implements ISomething, IB{
-  constructor(a:T){
-
+  private _score: number = 0;
+  spawner: ObjectSpawner;
+  set score(value:number){
+    this._score = value;
+    this.scoreView.node.textContent = this._score.toFixed(0);
   }
 
-  m(){
-
-  };
-  
-  b(){
-
-  }
-}
-
-class B1<T> implements ISomething, IB{
-  constructor(a:T){
-
-  }
-  
-  m(){
-
-  };
-  
-  b(){
-
-  }
-}
-
-interface AB<T extends number | string = number>{
-  new (a:T):(IB & ISomething);
-}
-
-function bbb(a:(IB & ISomething), b: AB<string>){
-  new b('4');
-}
-
-bbb(new A1<boolean>(true), B1)
-
-
-
-
-
-
-class MyLogger{
-  mode: string;
-  logs: Array<string>
-
-  constructor(mode:string){
-    this.mode = mode;
+  get score(){
+    return this._score;
   }
 
-  log(msg:string){
-    if (this.mode == 'prod'){
-      this.logs.push(msg);
-    } else {
-      console.log(msg);
+  constructor(parentNode:HTMLElement){
+    super(parentNode);
+    this.scoreView = new Control(this.node);
+    this.scoreView.node.style.padding = "20px";
+    this.score = 0;
+    const handleScore = (score:number)=>{ 
+      console.log(score, this.score);
+      this.score += score
     }
+    this.spawner = new ObjectSpawner(this.node, handleScore, ()=>this.objects);
   }
 
-  sendCrush(e: any){
+  private render(delta: number){
+    this.counter+= delta;
+    
+    if (this.counter> 1000){
+      const object = this.spawner.spawn();
+      this.objects.push(object);
+      this.counter = 0;
+    }
 
-  }
-}
-
-const logger = new MyLogger('prod');
-
-try {
-  logger.log('fd');
-
-  logger.log('ffdgfd');
-
-  logger.log('ffdd');
-} catch(e){
-  logger.sendCrush(e);
-}
-
-interface IStorage{
-  setItem: (name: string, value:string)=>Promise<boolean>;
-  getItem: (name: string)=>Promise<string>;
-}
-
-class MyAnyStorage implements IStorage{
-  private mode: string;
-
-  setItem(name: string, value: string){
-    if (this.mode == 'server'){
-      return fetch(`http://url/set?name=${name}&value=${value}`).then(res=> res.json()).then(result => result.status == true);
-    } else {
-      try{
-        localStorage.setItem(name, value);
-        return Promise.resolve(true);
-      } catch(e){
-        return Promise.resolve(false);
+    this.objects.forEach(obj => {
+      obj.tick(delta);
+      if (obj.counter<0){
+        obj.destroy();
       }
-    }
-  }
-
-  getItem(name: string){
-    if (this.mode == 'server'){
-      return fetch(`http://url/get?name=${name}`).then(res => res.text());
-    } else {
-      return Promise.resolve(localStorage.getItem(name))
-    }
-  }
-}
-
-class MyLocalStorage implements IStorage{
-  constructor(mode:string){
-
-  }
-  setItem(name: string, value: string){
-    try{
-      localStorage.setItem(name, value);
-      return Promise.resolve(true);
-    } catch(e){
-      return Promise.resolve(false);
-    }
-  }
-
-  getItem(name: string){
-    return Promise.resolve(localStorage.getItem(name))
-  }
-}
-
-class MyServerStorage implements IStorage{
-  constructor(mode:string){
-
-  }
-  setItem(name: string, value: string){
-    return fetch(`http://url/set?name=${name}&value=${value}`).then(res=> res.json()).then(result => result.status == true);
-  }
-
-  getItem(name: string){
-    return fetch(`http://url/get?name=${name}`).then(res => res.text());
-  }
-}
-
-interface IStorageConstructor{
-  new (mode:string): IStorage;
-}
-
-
-class StorageUser{
-  storage: IStorage;
-
-  constructor(storageService: IStorage){
-   // this.storage = new MyLocalStorage();
-   this.storage = storageService;
-  }
-
-  method(){
-    this.storage.setItem('fd', 'gfds');
-  }
-}
-
-interface IAppData{
-  data1: number,
-  data2: boolean
-}
-
-class AppState{
-  private storage: IStorage;
-
-  private data: IAppData;
-
-  public onChange: (data:IAppData)=>void;
-
-  constructor(storageService: IStorage, initialState:IAppData){
-   this.storage = storageService;
-   this.data = initialState;
-  }
-
-  loadFromStorage(): Promise<IAppData>{
-    return this.storage.getItem('appdata').then(res=>{
-       return this.setState(JSON.parse(res));
     });
+
+    this.objects = this.objects.filter(obj=>{
+      return !obj.isDestroyed;
+    })
+
+    this.lastFrameId = requestAnimationFrame((time=>{
+      if (!this.lTime){
+        this.lTime = time;
+      }
+      const nextDelta = time - this.lTime;
+      this.lTime = time;
+      this.render(nextDelta);
+    }));
   }
 
-  getState(): IAppData{
-    //return this.storage.getItem('appdata');
-    //this.data;
-    return this.data;
+  public stop(){
+    cancelAnimationFrame(this.lastFrameId);
   }
 
-  setState(newData: IAppData | ((last:IAppData)=>IAppData)){
-    if (typeof newData === "function"){
-      let data = newData(this.data);
-      return this.storage.setItem('appdata', JSON.stringify(data)).then(res=>{
-        this.data = data;
-        this.onChange(this.data);
-        return this.data;
-      });
-      //this.data = newData(this.data);
-    } else {
-      //this.data = newData
-      return this.storage.setItem('appdata', JSON.stringify(newData)).then(res=>{
-        this.data = newData;
-        this.onChange(this.data);
-        return this.data;
-      });
+  public start(){
+    this.render(null);
+  }
+}
+
+class ObjectSpawner{
+  private node: HTMLElement;
+  private onScore: (score: number) => void;
+  private getObjects: () => Array<GameObject>;
+
+  constructor(node:HTMLElement, onScore:(score:number)=>void, getObjects: ()=>Array<GameObject>){
+    this.node = node;
+    this.onScore = onScore;
+    this.getObjects = getObjects;
+  }
+
+  spawn(){
+    const rand = Math.random();
+    let object: GameObject = null;
+    if (rand< 0.3){
+      object = new GameObject(this.node, this.onScore);
     }
+    else if (rand <0.5) {
+      object = new GreenObject(this.node, this.onScore);
+    }
+    else {
+      object = new RedObject(this.node, this.onScore);
+    }
+    object.onClick = ()=>{
+      object.clickHandler(this.getObjects());
+    }
+    return object;
+  }
+}
+
+class GameObject extends Control{
+  private _counter: number;
+  public isDestroyed: boolean = false;
+  public onClick: ()=>void = ()=>{};
+  setScore: (score:number) => void;
+
+  set counter(value:number){
+    this._counter = value;
+    this.node.textContent = this.counter.toFixed(0);
+  }
+
+  get counter(){
+    return this._counter;
+  }
+
+  constructor(parentNode:HTMLElement, onScore:(score:number)=>void){
+    super(parentNode);
+    this.counter = 3000;
+    this.node.onclick = ()=>{
+      this.onClick();
+    }
+    this.setScore = (score:number) => onScore(score);
+  }
+
+  tick(delta:number){
+    this.counter-=delta;
+  }
+
+  clickHandler(objects:Array<GameObject>){
+
+  }
+
+  destroy(): void {
+    this.isDestroyed = true;
+    super.destroy();
+  }
+
+  
+}
+
+class RedObject extends GameObject{
+  constructor(parentNode:HTMLElement, onScore: (score:number)=>void){
+    super(parentNode, onScore);
+    this.counter = 15000;
+    this.node.style.backgroundColor = "#f00";
+  }
+
+  clickHandler(objects: GameObject[]): void {
+    super.clickHandler(objects);
+    this.counter -= 10000;
+  }
+
+  destroy(): void {
+    this.setScore(1)
+    super.destroy();
+  }
+}
+
+class GreenObject extends GameObject{
+  constructor(parentNode:HTMLElement, onScore: (score:number)=>void){
+    super(parentNode, onScore);
+    this.counter = 15000;
+    this.node.style.backgroundColor = "#090";
+  }
+
+  clickHandler(objects: GameObject[]): void {
+    console.log(objects.length)
+    super.clickHandler(objects);
+    objects.forEach(obj=>{
+      obj.counter -= 10000;
+    })
+  }
+}
+
+const app = new App(document.body);
+app.start();
+
+
+
+///Не надо так делать!!!
+class AA{
+  constructor(){
+
+  }
+  a = 43;
+  makeA(){
+    console.log(this.a);
+    document.querySelector('a').classList.add('asdf');
+    (document.querySelector('a').parentElement.parentElement.children[0].children[0] as HTMLElement).style.padding = '';
+    let a:number | null = null;
+    if (true){
+      a = 43;
+    }
+    (a as number) = 6543;
+  }
+  makeB(){
+    
+    document.body.append(document.createElement('a'))
+
+  }
+  makeC(){
+     document.addEventListener('click', ()=>{
+
+     }) 
+  }
+}
+
+let res = new AA();
+function addAll(){
+res.makeA();
+res.makeB();
+res.makeC();
+}
+addAll();
+
+
+///Дальше правильно
+
+class Server{
+  onRequest: (request: {url:string}) => any;
+  constructor(){
+
+  }
+}
+
+interface IEnpointProps{
+
+}
+
+function handleGet(props:IEnpointProps){
+  return ''
+}
+
+function handleSetName(props:IEnpointProps){
+  return ''
+}
+
+/*function createServer(){
+  const serv = new Server();
+  serv.onRequest = (request)=>{
+    switch(request.url){
+      case 'get':
+        return handleGet({})
+      break;
+      case 'setName':
+        return handleSetName({})
+      break;
+      case 'loadFile':
+        return '3'
+      break;
+    }
+  }
+}*/
+
+function createServer(){
+  const serv = new Server();
+  const endpoints: Record<string, (props:IEnpointProps)=>string> = {
+    'get': handleGet,
+    'setName': handleSetName,
+    'loadFile': (props:IEnpointProps)=>{
+      return ''
+    },
+    'endpoint1': ()=>{
+      return ''
+    }
+  }
+  serv.onRequest = (request)=>{
+    const current = endpoints[request.url];
+    if (current){
+      return current({});
+    }
+    return '404';
+  }
+}
+
+///////
+
+function showModal(onClose: (data:string)=>void){
+  const a = new Control(document.body);
+  const input = new Control<HTMLInputElement>(a.node);
+  a.node.onclick = ()=>{
+    onClose(input.node.value);
+    a.destroy();
+  }
+}
+
+showModal((data)=>{
+  console.log(data);
+});
+
+function showModalA(): [Promise<string>, ()=>void]{
+  let close:(data:string)=>void = null;
+  const cancell = ()=>{
+    close('');
+  }
+  const op: Promise<string> = new Promise((onClose)=>{
+    close = onClose;
+    const a = new Control(document.body);
+    const input = new Control<HTMLInputElement>(a.node);
+    a.node.onclick = ()=>{
+      onClose(input.node.value);
+      a.destroy();
+    }
+  });
+  return [op, cancell];
+}
+
+const [modalOperation, cancelModal] = showModalA();
+modalOperation.then((data)=>{
+  console.log(data);
+});
+onclick = ()=>{
+  return cancelModal();
+}
+
+(window as any).app = new Control(document.body);
+
+
+class ServiceA{
+  a(user:string){
+
+  }
+  b(user:string){
+
+  }
+}
+
+class ServiceB{
+  a1(user:string){
+
+  }
+  b(user:string){
     
   }
-}
-const appState = new AppState(new MyServerStorage('fds'), {data1: null, data2: null});
-/*.then(data=>{
-  //const appView = 
-})*/
-let view = new AppView(appState.getState());
-appState.onChange = (data)=>{
-  view.update(data);
-}
-appState.loadFromStorage()
+  c(){
 
-function initApp(StorageConstructor: IStorageConstructor){
-  let stor = new StorageConstructor('dfs')
-  new StorageUser(stor)
+  }
 }
 
-initApp(MyAnyStorage)
+class MyService{
+  private serviceA: ServiceA;
+  private serviceB: ServiceB;
+  private user: string;
+
+  constructor(user:string){
+    this.serviceA = new ServiceA();
+    this.serviceB = new ServiceB();
+    this.user = user;
+  }
+
+  a(){
+    this.serviceA.a(this.user)
+  }
+  a1(){
+    this.serviceB.a1(this.user);
+  }
+  b(){
+    this.serviceA.b(this.user);
+  }
+  b1(){
+    this.serviceB.b(this.user);
+  }
+}
+
+const s = new MyService('fdgfd');
+
+
+const globalWasteBin: Array<any> = [];
+
+function a11(){
+  globalWasteBin.push({id:323, value:43});
+}
+
+function a111(){
+  let shitItem = globalWasteBin.find((it)=> it.id === 323);
+  console.log(shitItem);
+}
+
+function b11(){
+  //globalWasteBin.push({id:323, value:43});
+  return {id:323, value:43};
+}
+
+function b111(item:any){
+  //let shitItem = globalWasteBin.find((it)=> it.id === 323);
+  console.log(item);
+}
+
+const item = b11();
+b111(item);
+

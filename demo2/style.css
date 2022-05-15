@@ -1,0 +1,172 @@
+input[type=checkbox]{
+  display: none;
+}
+
+input[type=radio]{
+  display: none;
+}
+
+.l1{
+  
+}
+
+#l1:checked ~ .view .l1 {
+  background-color: red;
+}
+
+#l2:checked ~ .view .l1 {
+  background-color: red;
+}
+
+#l1:checked ~ .view .l1_ {
+  background-color: red;
+}
+
+#l2:checked ~ .view .l2_ {
+  background-color: red;
+}
+
+.r1{
+  
+}
+
+#r1:checked ~ #r2:checked ~ .view .r1 {
+  background-color: red;
+}
+
+#r1:checked ~ .view .r1_ {
+  background-color: red;
+}
+
+#r2:checked ~ .view .r2_ {
+  background-color: red;
+}
+
+/*xor*/
+
+#n1:not(:checked) ~ #n2:checked ~ .view .n1 {
+  background-color: red;
+}
+#n1:checked ~ #n2:not(:checked) ~ .view .n1 {
+  background-color: red;
+}
+
+#n2:checked ~ .view .n2_ {
+  background-color: red;
+}
+
+#n1:checked ~ .view .n1_ {
+  background-color: red;
+}
+
+/* radio */
+
+#s1:checked ~ .view .sv1 {
+  background-color: red;
+}
+#s2:checked ~ .view .sv2 {
+  background-color: red;
+}
+#s3:checked ~ .view .sv3 {
+  background-color: red;
+}
+#s4:checked ~ .view .sv4 {
+  background-color: red;
+}
+
+#s1:checked ~ .view .sl1 {
+  background-color: red;
+}
+#s2:checked ~ .view .sl2 {
+  background-color: red;
+}
+#s3:checked ~ .view .sl3 {
+  background-color: red;
+}
+#s4:checked ~ .view .sl4 {
+  background-color: red;
+}
+
+.sa{
+  display:none;
+}
+
+#s1:checked ~ .view .sa2 {
+  display:block;
+}
+#s2:checked ~ .view .sa3 {
+  display:block;
+}
+#s3:checked ~ .view .sa4 {
+  display:block;
+}
+#s4:checked ~ .view .sa1 {
+  display:block;
+}
+
+.sd{
+  display:none;
+}
+
+#s1:checked ~ .view .sd4 {
+  display:block;
+}
+#s2:checked ~ .view .sd1 {
+  display:block;
+}
+#s3:checked ~ .view .sd2 {
+  display:block;
+}
+#s4:checked ~ .view .sd3 {
+  display:block;
+}
+
+.arrow_container{
+  position: relative;
+  width: 20px;
+}
+.pagination{
+  display:flex;
+}
+
+#c1:checked ~ .view .one {
+  display:none;
+}
+@keyframes one_ani{
+  0% {
+    transform: scale(1)
+  } 
+  50% {
+    transform: scale(1.5)
+  }
+  100% {
+    transform: scale(0)
+  }
+}
+.one_wrapper{
+  position: relative;
+  display:flex;
+  width: max-content;
+  border: 1px solid;
+}
+
+.one_view{
+  width: 100px;
+  height:100px;
+}
+
+#c1:checked ~ .view .one_wrapper {
+  transform: scale(0);
+  background-color: #f00; 
+  animation: one_ani 1s;
+  animation-iteration-count: 1;
+  animation-timing-function: linear;
+}
+
+.one{
+  position: absolute;
+  top:0;
+  left:0;
+  width: 100%;
+  height: 100%;
+}

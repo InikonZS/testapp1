@@ -393,3 +393,214 @@ function b111(item:any){
 const item = b11();
 b111(item);
 
+class User{
+  public name: string;
+  public email: string;
+
+  constructor(name: string, email:string){
+    this.name = name;
+    this.email = email;
+  }
+
+  static fromJson(data: any){
+    if (data == null || typeof data !== 'object'){
+      throw new Error('');
+    }
+    if (typeof data.name !== 'string'){
+      throw new Error('');
+    }
+    if (typeof data.email !== 'string'){
+      throw new Error('');
+    }
+    return new User(data.name, data.email);
+  }
+
+  toJson(){
+    return this;
+  }
+
+  sendMessage(msg:string){
+
+  }
+}
+
+function loadUserFromLocal(){
+  try {
+    let us111 = User.fromJson(JSON.parse(localStorage.getItem('fg')));
+    return us111;
+  } catch(e){
+    return new User('defName', 'defEmail');
+  }
+}
+
+class Player extends User{
+  public score: number;
+
+  auth(){
+
+  }
+}
+
+interface IRequest{
+  data: string;
+  type: string;
+}
+
+function send(msg: IRequest){
+
+}
+
+function receive():IRequest{
+  return {data: '', type:''}
+}
+
+const user = new User('', '');
+const player = new Player('fd', 'gfd');
+
+send({data: JSON.stringify(user.toJson()), type: "User"});
+send({data: JSON.stringify(player.toJson()), type: "Player"});
+
+const received = receive();
+
+interface IReceivable<Target = any> {
+  new (name:string, email:string): Target;
+  fromJson: (data:any) => Target;
+}
+
+const DTOMap: Record<string, IReceivable> = {
+  "User": User,
+  "Player": Player
+}
+
+interface TypeMap{
+  "User": User,
+  "Player": Player
+}
+
+function instanciateReceived<Target>(dto:IRequest){
+  const Contructor: IReceivable<Target> = DTOMap[dto.type];
+  if(!Contructor){
+    throw new Error('');
+  }
+  return Contructor.fromJson(JSON.parse(dto.data));
+}
+
+class Receiver{
+  public onReceive: (dto:IRequest) => void;
+  public send(msg:IRequest){
+
+  };
+}
+
+const rUser = instanciateReceived<User>(received)
+
+class MyReceiver{
+  private receiver: Receiver;
+  public onUser: (res: User)=>void;
+  public onPlayer: (res: Player)=>void;
+  constructor(){
+    this.receiver = new Receiver();
+    this.receiver.onReceive = (dto:IRequest)=>{
+      switch(dto.type){
+        case 'User':
+          this.onUser(instanciateReceived<User>(received));
+          break;
+        case "Player":
+          this.onPlayer(instanciateReceived<Player>(received));
+          break;
+      }
+      
+    }
+  }
+}
+
+let myReceiver = new MyReceiver();
+//myReceiver.onPlayer({})
+myReceiver.onPlayer = (res)=>{
+
+}
+
+myReceiver.onUser = (res)=>{
+
+}
+
+
+/*switch(received.type){
+  case 'User':
+    User.fromJson(JSON.parse(receive().data));
+    break;
+  case "Player":
+    Player.fromJson(JSON.parse(receive().data));
+    break;
+}*/
+//const rUser = 
+//const rPlayer = Player.fromJson(JSON.parse(receive().data));
+
+
+class R{
+  public onReceive: (dto: {type: string, data:any})=>void;
+
+  constructor(){
+
+  }
+
+  send(data:string):Promise<any>{
+    return Promise.resolve();
+  }
+}
+
+let om = {
+  'a':0,
+  'b':0
+}
+
+function keyRemover<G extends string>(a:Array<G>):<T = unknown>(ob:T) => Omit<T, G>{
+  //Object.keys(ob).forEach()
+  return (obj)=>{
+    /*const copy:any = {...obj}
+    Object.keys(copy).forEach(key=>{
+      delete copy[key];
+    });*/
+    const copy:any = {};
+   // const ar = Object.keys(obj);
+    //ar.forEach(key=>{
+    for (let key in obj){
+      if (!a.includes(key as any)){
+        copy[key] = obj[key];
+      }
+    }
+   // })
+    return copy
+  }
+}
+
+let remover = keyRemover(['a', 'b']);
+let res1 = remover({a:34, b:453, c:453});
+
+interface TMap{
+  'a':GameObject,
+  'b': RedObject
+}
+
+function addListener<T extends keyof TMap>(type: T, lst:(ev:TMap[T])=>void){
+
+}
+
+addListener('a', (ev)=>{
+  ev
+})
+
+addListener('b', (ev)=>{
+  ev
+})
+
+const asdf: "a" | "b" = "a";
+const fdddf: keyof TMap = 'b'
+
+
+const func = ()=>{
+  const df = 5;
+  const func1 = ()=>{
+    const df = 6;
+  }
+}

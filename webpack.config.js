@@ -12,7 +12,7 @@ const stylesHandler = isProduction ? MiniCssExtractPlugin.loader : 'style-loader
 
 
 const config = {
-    entry: './src/index.ts',
+    entry: './keyb/index.ts',
     devtool: "source-map",
     output: {
         path: path.resolve(__dirname, 'dist'),
@@ -23,8 +23,7 @@ const config = {
     },
     plugins: [
         new HtmlWebpackPlugin({
-            template: 'index.html',
-            favicon: "./fv.ico"
+            template: 'index.html'
         }),
 
         // Add your plugins here

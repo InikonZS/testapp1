@@ -1,0 +1,165 @@
+.card{
+  width:40px;
+  height:40px;
+  margin:1px;
+  position: relative;
+    perspective: 600px;
+}
+
+.card_side{
+  width: 100%;
+  height: 100%;
+  backface-visibility: hidden;
+  transition-duration: 400ms;
+}
+
+.card_back{
+  transform: rotateY(0deg);
+  background-color: #ccc;
+}
+
+.card_front{
+  position: absolute;
+  top:0px;
+  left:0px;
+  transform: rotateY(180deg);
+
+}
+
+.i1{
+   background-color:#f00;
+}
+
+.i2{
+   background-color:#00f;
+}
+
+.i3{
+   background-color:#090;
+}
+.l{
+  display:block;
+  width:100%;
+  height:100%;
+}
+
+.reset1{
+  display:none;
+}
+.reset1a{
+  display:none;
+}
+#i1:checked ~ .view #i1back{
+  transform: rotateY(180deg);
+}
+#i1:checked ~ .view #i1front{
+  transform: rotateY(0deg);
+}
+#i1:checked ~ .view .reset1{
+  display: block; 
+}
+#i1a:checked ~ .view .reset1a{
+  display: block; 
+}
+#i1:checked ~ #i1a:not(:checked) ~ .view .set2{
+  display: none; 
+}
+#i1:not(:checked) ~ #i1a:checked ~ .view .set2{
+  display: none; 
+}
+#i1:checked ~ #i1a:not(:checked) ~ .view .set3{
+  display: none; 
+}
+#i1:not(:checked) ~ #i1a:checked ~ .view .set3{
+  display: none; 
+}
+
+#i1:checked ~ #i1a:checked ~ .view .i1{
+  display: none; 
+}
+#i1:checked ~ #i1a:checked ~ .view .reset1{
+  display: none; 
+}
+#i1:checked ~ #i1a:checked ~ .view .reset1a{
+  display: none; 
+}
+
+
+
+.reset2{
+  display:none;
+}
+.reset2a{
+  display:none;
+}
+#i1a:checked ~ .view #i1aback{
+  transform: rotateY(180deg);
+}
+#i1a:checked ~ .view #i1afront{
+  transform: rotateY(0deg);
+}
+#i2:checked ~ .view .reset2{
+  display: block; 
+}
+ #i2a:checked ~ .view .reset2a{
+  display: block; 
+}
+#i2:checked ~ #i2a:not(:checked) ~ .view .set1{
+  display: none; 
+}
+#i2:not(:checked) ~ #i2a:checked ~ .view .set1{
+  display: none; 
+}
+#i2:checked ~ #i2a:not(:checked) ~ .view .set3{
+  display: none; 
+}
+#i2:not(:checked) ~ #i2a:checked ~ .view .set3{
+  display: none; 
+}
+#i2:checked ~ #i2a:checked ~ .view .i2{
+  display: none; 
+}
+#i2:checked ~ #i2a:checked ~ .view .reset2{
+  display: none; 
+}
+#i2:checked ~ #i2a:checked ~ .view .reset2a{
+  display: none; 
+}
+
+
+
+
+
+.reset3{
+  display:none;
+}
+.reset3a{
+  display:none;
+}
+#i3:checked ~ .view .reset3{
+  display: block; 
+}
+#i3a:checked ~ .view .reset3a{
+  display: block; 
+}
+#i3:checked ~ #i3a:not(:checked) ~ .view .set1{
+  display: none; 
+}
+#i3:not(:checked) ~ #i3a:checked ~ .view .set1{
+  display: none; 
+}
+#i3:checked ~ #i3a:not(:checked) ~ .view .set2{
+  display: none; 
+}
+#i3:not(:checked) ~ #i3a:checked ~ .view .set2{
+  display: none; 
+}
+#i3:checked ~ #i3a:checked ~ .view .i3{
+  display: none; 
+}
+#i3:checked ~ #i3a:checked ~ .view .reset3{
+  display: none; 
+}
+#i3:checked ~ #i3a:checked ~ .view .reset3a{
+  display: none; 
+}

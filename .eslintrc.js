@@ -15,5 +15,12 @@ module.exports = {
     '@typescript-eslint',
   ],
   rules: {
+    "no-restricted-syntax": [
+      'error',
+      {
+        selector: "CallExpression[callee.object.name='document'][callee.property.name='querySelector']",
+        message: "Квериселекторы запрещены"
+      }
+    ]
   },
 };

@@ -23,7 +23,8 @@ const config = {
     },
     plugins: [
         new HtmlWebpackPlugin({
-            template: 'index.html'
+            template: 'index.html',
+            //templateContent: ()=>{ return Promise.resolve('fd')}
         }),
 
         // Add your plugins here

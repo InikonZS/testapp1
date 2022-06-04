@@ -136,3 +136,11 @@ document.onkeydown = (e) => {
 
 (window as any).conf = conf;
 (window as any).ar = ar;*/
+/*function c(_s:any){
+  if (typeof _s != 'string') throw new Error();
+}
+let ar = ['f'];
+let s = ar.find(it=>it=='d');
+c(s);
+s.indexOf('54');*/
+

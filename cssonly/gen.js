@@ -14,6 +14,12 @@ const generateInputs = (count=0)=>{
   return inputs;
 }
 
+/**
+ * @param {number} index
+ * @param {number} count
+ * @returns {string}
+ * @description generate card
+ */
 const generateCard = (index, count=0)=>{
   const resetters = [];
   const indexEven = index%2==0? '' : 'a';

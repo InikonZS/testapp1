@@ -1,6 +1,7 @@
 import "./style.css";
 import Control from "./control";
 import Signal from "./signal";
+import { type } from "os";
 
 class App extends Control{
   private lastFrameId: number;
@@ -603,4 +604,86 @@ const func = ()=>{
   const func1 = ()=>{
     const df = 6;
   }
+}
+
+interface I1{
+  a: string;
+}
+
+interface I2 extends I1{
+  b:number;
+}
+
+const c: I2 = {
+  a:'fs',
+  b:3
+}
+
+type T1 = {
+  a:string
+}
+
+type T2 = {
+  b:number
+}
+
+const c1: T1 & T2 = {
+  a:'f',
+  b:3
+}
+
+type IClb = (a: T2 & T1, b: I2) => number;
+class A1{
+  d: string;
+  constructor(a:string, b:number){
+    this.d = a + b.toString();
+  }
+  
+  show(){
+    console.log(this.d);
+  }
+}
+class A2{
+  d: string;
+  constructor(a:string, b:number){
+    this.d = b.toString() + a;
+  }
+  show(){
+    const el = document.createElement('div');
+    ///...
+  }
+}
+
+interface AX{
+  show:()=>void;
+  d: string;
+}
+interface AXConstructor{
+  new (a:string, b:number):AX;
+}
+
+function hgd(C: AXConstructor, callback?: IClb){
+  const c = new C('d', 2);
+  c.show();
+  console.log(c.d);
+}
+
+hgd(A2);
+
+interface IMsg<DataType>{
+  sender: string,
+  id: number,
+  data: DataType
+}
+
+const msg1: IMsg<boolean> = {
+  data: true,
+  sender: "",
+  id: 0
+}
+
+const rec: Record<string, boolean> = {
+  'dfd': true,
+  "f": false,
+  '3': true
 }
